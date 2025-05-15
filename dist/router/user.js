@@ -20,12 +20,11 @@ const db_1 = require("../db/db");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const router = (0, express_1.Router)();
 router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("signup to create a zap");
     const body = req.body;
     const parsedData = auth_1.signUpSchema.safeParse(body);
     if (!parsedData.success) {
         res.status(411).json({
-            msg: "Invalid Input"
+            msg: "Invalid Input",
         });
     }
     if (!parsedData.data) {
@@ -34,19 +33,19 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
     const existingUser = yield db_1.prisma.user.findFirst({
         where: {
             email: parsedData.data.email,
-        }
+        },
     });
     if (existingUser) {
         res.status(403).json({
-            msg: "User already exists"
+            msg: "User already exists",
         });
     }
     const user = yield db_1.prisma.user.create({
         data: {
             email: parsedData.data.email,
             name: parsedData.data.username,
-            password: parsedData.data.password
-        }
+            password: parsedData.data.password,
+        },
     });
     if (user) {
         console.log("user created");
@@ -57,48 +56,47 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
 }));
 router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
-    console.log("signin to create a zap");
     const body = req.body;
     const parsedData = auth_1.signInSchema.safeParse(body);
     if (!parsedData.success) {
         res.status(411).json({
-            msg: "Invalid Inputs"
+            msg: "Invalid Inputs",
         });
     }
     const validUser = yield db_1.prisma.user.findFirst({
         where: {
             email: (_a = parsedData.data) === null || _a === void 0 ? void 0 : _a.email,
-            password: (_b = parsedData.data) === null || _b === void 0 ? void 0 : _b.password
-        }
+            password: (_b = parsedData.data) === null || _b === void 0 ? void 0 : _b.password,
+        },
     });
-    if (validUser) {
+    if (!validUser) {
         res.json({
-            message: "user signedIn"
+            message: "User is Not found",
         });
     }
     //sign the token
     const token = jsonwebtoken_1.default.sign({
-        id: validUser === null || validUser === void 0 ? void 0 : validUser.id
+        id: validUser === null || validUser === void 0 ? void 0 : validUser.id,
     }, "secret");
     res.status(200).json({
-        token
+        token,
     });
 }));
 router.get("/user", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("authenticated user");
     //@ts-ignore
     const id = req.id;
-    const user = db_1.prisma.user.findFirst({
+    const user = yield db_1.prisma.user.findFirst({
         where: {
-            id
+            id,
         },
         select: {
             email: true,
-            name: true
-        }
+            name: true,
+        },
     });
     res.status(200).json({
-        user
+        user,
     });
 }));
 exports.userRouter = router;
