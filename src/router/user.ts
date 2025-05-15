@@ -1,8 +1,10 @@
-import { Router } from "express";
+import { json, Router } from "express";
 import { authMiddleware } from "../middleware";
 import { signInSchema, signUpSchema } from "../types/auth";
 import { prisma } from "../db/db";
 const router = Router();
+import jwt from "jsonwebtoken"
+
 
 router.post("/signup", async (req, res) => {
   console.log("signup to create a zap");
@@ -19,12 +21,10 @@ router.post("/signup", async (req, res) => {
   const existingUser = await prisma.user.findFirst({
     where:{
       email:parsedData.data.email,
-      password:parsedData.data.password,
-      name:parsedData.data.username
     }
   })
   if (existingUser){
-    res.status(411).json({
+    res.status(403).json({
       msg:"User already exists"
     })
   }
@@ -43,6 +43,8 @@ router.post("/signup", async (req, res) => {
   });
 });
 
+
+
 router.post("/signin", async(req,res) => {
   console.log("signin to create a zap");
   const body = req.body
@@ -60,12 +62,36 @@ router.post("/signin", async(req,res) => {
   })
   if(validUser){
     res.json({
-      message:"user is valid"
+      message:"user signedIn"
     })
   }
+  //sign the token
+  const token = jwt.sign({
+    id:validUser?.id
+  },"secret")
+  res.status(200).json({
+    token
+  })
 });
 
-router.get("/user", authMiddleware , ()=>{
+
+router.get("/user", authMiddleware , async(req,res)=>{
     console.log("authenticated user")
+    //@ts-ignore
+    const id = req.id
+    const user = prisma.user.findFirst({
+      where:{
+        id
+      },
+      select:{
+        email:true,
+        name:true
+      }
+    })
+    res.status(200).json({
+      user
+    })
 })
+
+
 export const userRouter = router;
