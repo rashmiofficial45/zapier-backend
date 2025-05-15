@@ -17,8 +17,8 @@ const express_1 = require("express");
 const middleware_1 = require("../middleware");
 const auth_1 = require("../types/auth");
 const db_1 = require("../db/db");
-const router = (0, express_1.Router)();
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const router = (0, express_1.Router)();
 router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("signup to create a zap");
     const body = req.body;

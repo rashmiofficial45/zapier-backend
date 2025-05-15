@@ -1,13 +1,12 @@
-import { json, Router } from "express";
+import { Router } from "express";
 import { authMiddleware } from "../middleware";
 import { signInSchema, signUpSchema } from "../types/auth";
 import { prisma } from "../db/db";
-const router = Router();
 import jwt from "jsonwebtoken"
+const router = Router();
 
 
 router.post("/signup", async (req, res) => {
-  console.log("signup to create a zap");
   const body = req.body
   const parsedData = signUpSchema.safeParse(body)
   if (!parsedData.success){
