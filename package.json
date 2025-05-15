@@ -12,9 +12,11 @@
   "packageManager": "pnpm@10.10.0",
   "devDependencies": {
     "@types/cors": "^2.8.18",
-    "@types/express": "^5.0.1"
+    "@types/express": "^5.0.1",
+    "prisma": "^6.8.0"
   },
   "dependencies": {
+    "@prisma/client": "6.8.0",
     "cors": "^2.8.5",
     "express": "^5.1.0"
   }
