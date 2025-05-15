@@ -82,7 +82,7 @@ router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function*
         token,
     });
 }));
-router.get("/user", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("authenticated user");
     //@ts-ignore
     const id = req.id;

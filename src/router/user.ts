@@ -72,7 +72,7 @@ router.post("/signin", async (req, res) => {
   });
 });
 
-router.get("/user", authMiddleware, async (req, res) => {
+router.get("/", authMiddleware, async (req, res) => {
   console.log("authenticated user");
   //@ts-ignore
   const id = req.id;
