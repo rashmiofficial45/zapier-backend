@@ -46,8 +46,23 @@ router.post("/", authMiddleware, async (req, res) => {
   }
 });
 
-router.get("/", authMiddleware, (req, res) => {
+router.get("/", authMiddleware, async (req, res) => {
   console.log("see the existing zap for a user");
+  //@ts-ignore
+  const id = req.id
+  try {
+    const zap = await prisma.zap.findMany({
+      where:{
+        userId:id
+      },
+    })
+    res.status(200).json({
+      zap
+    })
+  } catch (error) {
+    console.error("Zap creation error:", error);
+    res.status(500).json({ msg: "Internal Server Error" });
+  }
 });
 
 router.get("/:zapId", authMiddleware, async (req, res) => {

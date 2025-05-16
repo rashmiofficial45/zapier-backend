@@ -53,9 +53,25 @@ router.post("/", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, vo
         res.status(500).json({ msg: "Internal Server Error" });
     }
 }));
-router.get("/", middleware_1.authMiddleware, (req, res) => {
+router.get("/", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("see the existing zap for a user");
-});
+    //@ts-ignore
+    const id = req.id;
+    try {
+        const zap = yield db_1.prisma.zap.findMany({
+            where: {
+                userId: id
+            },
+        });
+        res.status(200).json({
+            zap
+        });
+    }
+    catch (error) {
+        console.error("Zap creation error:", error);
+        res.status(500).json({ msg: "Internal Server Error" });
+    }
+}));
 router.get("/:zapId", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { zapId } = yield req.params;
     console.log("route to see the individual zap with zapId");
