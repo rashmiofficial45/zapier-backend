@@ -67,25 +67,28 @@ router.get("/", authMiddleware, async (req, res) => {
 
 router.get("/:zapId", authMiddleware, async (req, res) => {
   const { zapId } = await req.params;
+  //@ts-ignore
+  const id = req.id;
   try {
     const zapDetails = await prisma.zap.findFirst({
-      where:{
-        id:zapId
+      where: {
+        id: zapId,
+        userId:id
       },
-      select:{
-        trigger:true,
-        actions:true,
-        zapRun:true,
-      }
-    })
-    if(!zapDetails){
+      select: {
+        trigger: true,
+        actions: true,
+        zapRun: true,
+      },
+    });
+    if (!zapDetails) {
       res.status(403).json({
-        msg:"Invalid zap"
-      })
+        msg: "Invalid zap",
+      });
     }
     res.status(200).json({
-      zapDetails
-    })
+      zapDetails,
+    });
   } catch (error) {
     console.error("Invalid Zap", error);
     res.status(500).json({ msg: "Internal Server Error" });
