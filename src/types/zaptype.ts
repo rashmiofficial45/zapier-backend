@@ -46,6 +46,11 @@ export const ZapRunSchema = z.object({
 
 // Zap Schema
 export const ZapCreateSchema = z.object({
-  actions: z.array(ActionSchema),
-  availableTriggerId : z.string().uuid(),
+  actions: z.array(
+    z.object({
+      action: z.string(),
+      actionId: z.string().uuid(),
+    })
+  ),
+  availableTriggerId: z.string().uuid(),
 });
