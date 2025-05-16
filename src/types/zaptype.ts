@@ -1,19 +1,19 @@
 import { z } from "zod";
 
 // AvailableTrigger Schema
-const AvailableTriggerSchema = z.object({
+export const AvailableTriggerSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
 });
 
 // AvailableAction Schema
-const AvailableActionSchema = z.object({
+export const AvailableActionSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
 });
 
 // Trigger Schema
-const TriggerSchema = z.object({
+export const TriggerSchema = z.object({
   id: z.string().uuid(),
   zapId: z.string().uuid(),
   triggerId: z.string().uuid(),
@@ -21,7 +21,7 @@ const TriggerSchema = z.object({
 });
 
 // Action Schema
-const ActionSchema = z.object({
+export const ActionSchema = z.object({
   id: z.string().uuid(),
   action: z.string(),
   sortingOrder: z.number().int().default(0),
@@ -31,13 +31,13 @@ const ActionSchema = z.object({
 });
 
 // ZapRunOutbox Schema
-const ZapRunOutboxSchema = z.object({
+export const ZapRunOutboxSchema = z.object({
   id: z.string().uuid(),
   zapRunId: z.string().uuid(),
 });
 
 // ZapRun Schema
-const ZapRunSchema = z.object({
+export const ZapRunSchema = z.object({
   id: z.string().uuid(),
   zapId: z.string().uuid(),
   metadata: z.any().optional(),
@@ -45,9 +45,7 @@ const ZapRunSchema = z.object({
 });
 
 // Zap Schema
-const ZapCreateSchema = z.object({
-  id: z.string().uuid(),
-  trigger: TriggerSchema.optional(),
+export const ZapCreateSchema = z.object({
   actions: z.array(ActionSchema),
-  zapRun: z.array(ZapRunSchema),
+  availableTriggerId : z.string().uuid(),
 });
