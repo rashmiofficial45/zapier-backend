@@ -60,14 +60,35 @@ router.get("/", authMiddleware, async (req, res) => {
       zap
     })
   } catch (error) {
-    console.error("Zap creation error:", error);
+    console.error("Invalid User", error);
     res.status(500).json({ msg: "Internal Server Error" });
   }
 });
 
 router.get("/:zapId", authMiddleware, async (req, res) => {
   const { zapId } = await req.params;
-
-  console.log("route to see the individual zap with zapId");
+  try {
+    const zapDetails = await prisma.zap.findFirst({
+      where:{
+        id:zapId
+      },
+      select:{
+        trigger:true,
+        actions:true,
+        zapRun:true,
+      }
+    })
+    if(!zapDetails){
+      res.status(403).json({
+        msg:"Invalid zap"
+      })
+    }
+    res.status(200).json({
+      zapDetails
+    })
+  } catch (error) {
+    console.error("Invalid Zap", error);
+    res.status(500).json({ msg: "Internal Server Error" });
+  }
 });
 export const zapRouter = router;
