@@ -74,24 +74,27 @@ router.get("/", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, voi
 }));
 router.get("/:zapId", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { zapId } = yield req.params;
+    //@ts-ignore
+    const id = req.id;
     try {
         const zapDetails = yield db_1.prisma.zap.findFirst({
             where: {
-                id: zapId
+                id: zapId,
+                userId: id
             },
             select: {
                 trigger: true,
                 actions: true,
                 zapRun: true,
-            }
+            },
         });
         if (!zapDetails) {
             res.status(403).json({
-                msg: "Invalid zap"
+                msg: "Invalid zap",
             });
         }
         res.status(200).json({
-            zapDetails
+            zapDetails,
         });
     }
     catch (error) {

@@ -20,83 +20,100 @@ const db_1 = require("../db/db");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const router = (0, express_1.Router)();
 router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const body = req.body;
-    const parsedData = auth_1.signUpSchema.safeParse(body);
-    if (!parsedData.success) {
-        res.status(411).json({
-            msg: "Invalid Input",
+    try {
+        const body = req.body;
+        const parsedData = auth_1.signUpSchema.safeParse(body);
+        if (!parsedData.success) {
+            res.status(411).json({
+                msg: "Invalid Input",
+            });
+            return;
+        }
+        if (!parsedData.data) {
+            throw new Error("data is not provided");
+        }
+        const existingUser = yield db_1.prisma.user.findFirst({
+            where: {
+                email: parsedData.data.email,
+            },
+        });
+        if (existingUser) {
+            res.status(403).json({
+                msg: "User already exists",
+            });
+            return;
+        }
+        const user = yield db_1.prisma.user.create({
+            data: {
+                email: parsedData.data.email,
+                name: parsedData.data.username,
+                password: parsedData.data.password,
+            },
+        });
+        if (user) {
+            console.log("user created");
+        }
+        res.status(200).json({
+            user: user,
         });
     }
-    if (!parsedData.data) {
-        throw new Error("data is not provided");
+    catch (error) {
+        console.error("Signup Error:", error);
+        res.status(500).json({ msg: "Internal Server Error" });
     }
-    const existingUser = yield db_1.prisma.user.findFirst({
-        where: {
-            email: parsedData.data.email,
-        },
-    });
-    if (existingUser) {
-        res.status(403).json({
-            msg: "User already exists",
-        });
-    }
-    const user = yield db_1.prisma.user.create({
-        data: {
-            email: parsedData.data.email,
-            name: parsedData.data.username,
-            password: parsedData.data.password,
-        },
-    });
-    if (user) {
-        console.log("user created");
-    }
-    res.status(200).json({
-        user: user,
-    });
 }));
 router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
-    const body = req.body;
-    const parsedData = auth_1.signInSchema.safeParse(body);
-    if (!parsedData.success) {
-        res.status(411).json({
-            msg: "Invalid Inputs",
+    try {
+        const body = req.body;
+        const parsedData = auth_1.signInSchema.safeParse(body);
+        if (!parsedData.success) {
+            res.status(411).json({
+                msg: "Invalid Inputs",
+            });
+            return;
+        }
+        const validUser = yield db_1.prisma.user.findFirst({
+            where: {
+                email: (_a = parsedData.data) === null || _a === void 0 ? void 0 : _a.email,
+                password: (_b = parsedData.data) === null || _b === void 0 ? void 0 : _b.password,
+            },
+        });
+        if (!validUser) {
+            res.json({
+                message: "User is Not found",
+            });
+            return;
+        }
+        //sign the token
+        const token = jsonwebtoken_1.default.sign({
+            id: validUser === null || validUser === void 0 ? void 0 : validUser.id,
+        }, "secret");
+        res.status(200).json({
+            token,
         });
     }
-    const validUser = yield db_1.prisma.user.findFirst({
-        where: {
-            email: (_a = parsedData.data) === null || _a === void 0 ? void 0 : _a.email,
-            password: (_b = parsedData.data) === null || _b === void 0 ? void 0 : _b.password,
-        },
-    });
-    if (!validUser) {
-        res.json({
-            message: "User is Not found",
-        });
+    catch (error) {
+        console.error("Signin Error:", error);
+        res.status(500).json({ msg: "Internal Server Error" });
     }
-    //sign the token
-    const token = jsonwebtoken_1.default.sign({
-        id: validUser === null || validUser === void 0 ? void 0 : validUser.id,
-    }, "secret");
-    res.status(200).json({
-        token,
-    });
 }));
 router.get("/", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("authenticated user");
-    //@ts-ignore
-    const id = req.id;
-    const user = yield db_1.prisma.user.findFirst({
-        where: {
-            id,
-        },
-        select: {
-            email: true,
-            name: true,
-        },
-    });
-    res.status(200).json({
-        user,
-    });
+    try {
+        //@ts-ignore
+        const id = req.id;
+        const user = yield db_1.prisma.user.findFirst({
+            where: { id },
+            select: {
+                email: true,
+                name: true,
+            },
+        });
+        res.status(200).json({ user });
+    }
+    catch (error) {
+        console.error("Get User Error:", error);
+        res.status(500).json({ msg: "Internal Server Error" });
+    }
 }));
 exports.userRouter = router;
