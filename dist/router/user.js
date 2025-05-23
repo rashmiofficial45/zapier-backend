@@ -105,8 +105,7 @@ router.get("/", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, voi
         const user = yield db_1.prisma.user.findFirst({
             where: { id },
             select: {
-                email: true,
-                name: true,
+                zap: true,
             },
         });
         res.status(200).json({ user });

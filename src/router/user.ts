@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "express";
+import { Router } from "express";
 import { authMiddleware } from "../middleware";
 import { signInSchema, signUpSchema } from "../types/auth";
 import { prisma } from "../db/db";
@@ -94,8 +94,7 @@ router.get("/", authMiddleware, async (req, res) => {
     const user = await prisma.user.findFirst({
       where: { id },
       select: {
-        email: true,
-        name: true,
+        zap:true,
       },
     });
 
