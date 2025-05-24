@@ -51,13 +51,23 @@ router.get("/", authMiddleware, async (req, res) => {
   //@ts-ignore
   const id = req.id
   try {
-    const zap = await prisma.zap.findMany({
+    const zaps = await prisma.zap.findMany({
       where:{
         userId:id
       },
+      select:{
+        id:true,
+        trigger:{
+          include:{
+            type:true
+          }
+        },
+        userId:true,
+        actions:true
+      }
     })
     res.status(200).json({
-      zap
+      zaps
     })
   } catch (error) {
     console.error("Invalid User", error);

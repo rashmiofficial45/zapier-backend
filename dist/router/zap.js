@@ -58,13 +58,23 @@ router.get("/", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, voi
     //@ts-ignore
     const id = req.id;
     try {
-        const zap = yield db_1.prisma.zap.findMany({
+        const zaps = yield db_1.prisma.zap.findMany({
             where: {
                 userId: id
             },
+            select: {
+                id: true,
+                trigger: {
+                    include: {
+                        type: true
+                    }
+                },
+                userId: true,
+                actions: true
+            }
         });
         res.status(200).json({
-            zap
+            zaps
         });
     }
     catch (error) {
